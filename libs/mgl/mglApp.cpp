@@ -147,6 +147,7 @@ void Engine::setupOpenGL() {
   glDepthMask(GL_TRUE);
   glDepthRange(0.0, 1.0);
   glClearDepth(1.0);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
   glFrontFace(GL_CCW);

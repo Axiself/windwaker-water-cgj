@@ -26,6 +26,7 @@ const char TEXCOORD_ATTRIBUTE[] = "inTexcoord";
 const char TANGENT_ATTRIBUTE[] = "inTangent";
 const char BITANGENT_ATTRIBUTE[] = "inBitangent";
 const char COLOR_ATTRIBUTE[] = "inColor";
+const char LIGHT_POS_ATTRIBUTE[] = "inLightPos";
 
 ////////////////////////////////////////////////////////////////////////////////
 }  // namespace mgl

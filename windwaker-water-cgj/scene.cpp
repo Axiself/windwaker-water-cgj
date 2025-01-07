@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#include <iostream>
 
 
 void SceneGraph::createShaderPrograms() {
@@ -85,8 +86,8 @@ void SceneNode::addMesh(std::string mesh_fullname) {
 void SceneNode::createShaderPrograms() {
 	if (mesh != nullptr) {
 		Shaders = new mgl::ShaderProgram();
-		Shaders->addShader(GL_VERTEX_SHADER, "cube-vs.glsl");
-		Shaders->addShader(GL_FRAGMENT_SHADER, "cube-fs.glsl");
+		Shaders->addShader(GL_VERTEX_SHADER, "scene-vs.glsl");
+		Shaders->addShader(GL_FRAGMENT_SHADER, "scene-fs.glsl");
 
 		Shaders->addAttribute(mgl::POSITION_ATTRIBUTE, mgl::Mesh::POSITION);
 		if (mesh->hasNormals()) {
@@ -100,13 +101,14 @@ void SceneNode::createShaderPrograms() {
 		}
 
 		Shaders->addUniform(mgl::COLOR_ATTRIBUTE);
-
+		Shaders->addUniform(mgl::LIGHT_POS_ATTRIBUTE);
 		Shaders->addUniform(mgl::MODEL_MATRIX);
 		Shaders->addUniformBlock(mgl::CAMERA_BLOCK, UBO_BP);
 		Shaders->create();
 
 		ModelMatrixId = Shaders->Uniforms[mgl::MODEL_MATRIX].index;
 		ColorId = Shaders->Uniforms[mgl::COLOR_ATTRIBUTE].index;
+		LightPosId = Shaders->Uniforms[mgl::LIGHT_POS_ATTRIBUTE].index;
 	}
 
 	for (auto& child : children) {
@@ -114,14 +116,21 @@ void SceneNode::createShaderPrograms() {
 	}
 }
 
-void SceneNode::setColor(float r, float g, float b) {
-	color = glm::vec3(r, g, b);
+void SceneNode::setColor(float r, float g, float b, float a) {
+	color = glm::vec4(r, g, b, a);
 }
 
 void SceneNode::draw() {
+	if (color[3] < 1.0f) {
+		glEnable(GL_BLEND);
+	}
+	else {
+		glDisable(GL_BLEND);
+	}
 	if (mesh != nullptr) {
 		Shaders->bind();
-		glUniform3fv(ColorId, 1, glm::value_ptr(color));
+		glUniform4fv(ColorId, 1, glm::value_ptr(color));
+		glUniform3fv(LightPosId, 1, glm::value_ptr(glm::vec3(0.0, 1.0, 0.0)));
 		glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 		mesh->draw();
 		Shaders->unbind();
@@ -160,26 +169,6 @@ void SceneNode::setPosition(glm::vec3 position) {
 	for (auto& child : children) {
 		child->setPosition(position);
 	}
-}
-
-void SceneNode::setBoxConfigurationModelMatrix(glm::mat4 matrix) {
-	boxConfigurationModelMatrix = matrix;
-}
-
-void SceneNode::setFigureConfigurationModelMatrix(glm::mat4 matrix) {
-	figureConfigurationModelMatrix = matrix;
-}
-
-glm::mat4 SceneNode::getBoxConfigurationModelMatrix() {
-	return boxConfigurationModelMatrix;
-}
-
-glm::mat4 SceneNode::getFigureConfigurationModelMatrix() {
-	return figureConfigurationModelMatrix;
-}
-
-void SceneNode::setModelMatrix(glm::mat4 matrix) {
-	modelMatrix = matrix;
 }
 
 std::vector<SceneNode*> SceneNode::getChildren() {

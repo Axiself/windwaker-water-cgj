@@ -60,12 +60,12 @@ void MyApp::createMeshes() {
 void MyApp::createScene() {
 
     // set object colors
-    WaterPlane.setColor(0.0f, 0.3f, 0.6f);
-	WaterFoam.setColor(1.0f, 1.0f, 1.0f);
+	WaterFoam.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+    WaterPlane.setColor(0.0f, 0.3f, 0.6f, 0.3f);
 
     // add objects to the root object
-    Ocean.add(&WaterPlane);
 	Ocean.add(&WaterFoam);
+    Ocean.add(&WaterPlane);
 
     // set root
     scene.setRoot(&Ocean);
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
     mgl::Engine& engine = mgl::Engine::getInstance();
     engine.setApp(new MyApp());
     engine.setOpenGL(4, 6);
-    engine.setWindow(800, 600, "Projeto 3D Tangram", 0, 1);
+    engine.setWindow(800, 600, "Windwaker Water CGJ", 0, 1);
     engine.init();
     engine.run();
     exit(EXIT_SUCCESS);

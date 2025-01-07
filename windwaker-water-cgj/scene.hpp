@@ -32,8 +32,9 @@ private:
     std::vector<SceneNode*> children;
     GLint ModelMatrixId;
     GLint ColorId;
+    GLint LightPosId;
     mgl::ShaderProgram* Shaders = nullptr;
-    glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 public:
     void addMesh(std::string mesh_fullname);
@@ -44,12 +45,7 @@ public:
     void scale(glm::vec3 vector);
     void setPosition(glm::vec3 vector);
     void createShaderPrograms();
-    void setColor(float r, float g, float b);
-    void setBoxConfigurationModelMatrix(glm::mat4 matrix);
-    void setFigureConfigurationModelMatrix(glm::mat4 matrix);
-    glm::mat4 getBoxConfigurationModelMatrix();
-    glm::mat4 getFigureConfigurationModelMatrix();
-    void setModelMatrix(glm::mat4 matrix);
+    void setColor(float r, float g, float b, float a);
     std::vector<SceneNode*> getChildren();
 
 };
