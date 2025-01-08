@@ -26,11 +26,10 @@ public:
 
 private:
     SceneGraph scene;
+	SceneNode Skybox;
     SceneNode Ocean;
     SceneNode WaterPlane;
     SceneNode WaterFoam;
-    SceneNode SeaBed;
-
 
     double mouse_x, mouse_y;
     bool rotating = false;
@@ -53,17 +52,21 @@ private:
 void MyApp::createMeshes() {
     WaterPlane.addMesh("../assets/models/WaterPlane.obj");
 	WaterFoam.addMesh("../assets/models/Foam.obj");
+	Skybox.addMesh("../assets/models/cube-v.obj");
 }
 
 ///////////////////////////////////////////////////////////////////////// SCENE
 
 void MyApp::createScene() {
+	// create skybox
+	Skybox.createSkybox("../assets/textures/lost_at_sea", ".png");
 
     // set object colors
 	WaterFoam.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-    WaterPlane.setColor(0.0f, 0.3f, 0.6f, 0.3f);
+    WaterPlane.setColor(0.0f, 0.3f, 0.6f, 0.5f);
 
     // add objects to the root object
+	Ocean.add(&Skybox);
 	Ocean.add(&WaterFoam);
     Ocean.add(&WaterPlane);
 

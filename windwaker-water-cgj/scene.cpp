@@ -83,11 +83,22 @@ void SceneNode::addMesh(std::string mesh_fullname) {
 	mesh->create(mesh_fullname);
 }
 
+void SceneNode::createSkybox(std::string prefix, std::string suffix) {
+	isSkybox = true;
+	texture.loadCubeMap(prefix, suffix);
+}
+
 void SceneNode::createShaderPrograms() {
 	if (mesh != nullptr) {
 		Shaders = new mgl::ShaderProgram();
-		Shaders->addShader(GL_VERTEX_SHADER, "scene-vs.glsl");
-		Shaders->addShader(GL_FRAGMENT_SHADER, "scene-fs.glsl");
+		if (!isSkybox) {
+			Shaders->addShader(GL_VERTEX_SHADER, "scene-vs.glsl");
+			Shaders->addShader(GL_FRAGMENT_SHADER, "scene-fs.glsl");
+		}
+		else {
+			Shaders->addShader(GL_VERTEX_SHADER, "skybox-vs.glsl");
+			Shaders->addShader(GL_FRAGMENT_SHADER, "skybox-fs.glsl");
+		}
 
 		Shaders->addAttribute(mgl::POSITION_ATTRIBUTE, mgl::Mesh::POSITION);
 		if (mesh->hasNormals()) {
@@ -129,10 +140,24 @@ void SceneNode::draw() {
 	}
 	if (mesh != nullptr) {
 		Shaders->bind();
+
+		if (isSkybox) {
+			texture.bind();
+			glDisable(GL_CULL_FACE);
+			glDepthMask(GL_FALSE);
+		}
+
 		glUniform4fv(ColorId, 1, glm::value_ptr(color));
-		glUniform3fv(LightPosId, 1, glm::value_ptr(glm::vec3(0.0, 1.0, 0.0)));
+		glUniform3fv(LightPosId, 1, glm::value_ptr(glm::vec3(0.0, 2.0, 0.0)));
 		glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 		mesh->draw();
+
+		if (isSkybox) {
+			texture.unbind();
+			glEnable(GL_CULL_FACE);
+			glDepthMask(GL_TRUE);
+		}
+
 		Shaders->unbind();
 	}
 

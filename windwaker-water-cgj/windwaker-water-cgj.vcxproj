@@ -134,7 +134,9 @@
     <ClCompile Include="..\libs\mgl\mglCamera.cpp" />
     <ClCompile Include="..\libs\mgl\mglError.cpp" />
     <ClCompile Include="..\libs\mgl\mglMesh.cpp" />
+    <ClCompile Include="..\libs\mgl\mglSampler.cpp" />
     <ClCompile Include="..\libs\mgl\mglShader.cpp" />
+    <ClCompile Include="..\libs\mgl\mglTexture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scene.cpp" />
   </ItemGroup>

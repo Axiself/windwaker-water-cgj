@@ -1,5 +1,6 @@
 #include <vector>
 #include "../libs/mgl/mgl.hpp"
+#include "../libs/mgl/mglTexture.hpp"
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -26,9 +27,7 @@ class SceneNode {
 private:
     const GLuint UBO_BP = 0;
     mgl::Mesh* mesh = nullptr;
-    glm::mat4 modelMatrix = glm::mat4(1.0f);
-    glm::mat4 boxConfigurationModelMatrix;
-    glm::mat4 figureConfigurationModelMatrix;
+	glm::mat4 modelMatrix = glm::mat4(1.0f);
     std::vector<SceneNode*> children;
     GLint ModelMatrixId;
     GLint ColorId;
@@ -36,8 +35,13 @@ private:
     mgl::ShaderProgram* Shaders = nullptr;
     glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
+	bool isSkybox = false;
+    GLint SkyboxTextureId;
+    mgl::TextureCubeMap texture;
+
 public:
     void addMesh(std::string mesh_fullname);
+	void createSkybox(std::string prefix, std::string suffix);
     void draw();
     void add(SceneNode* child);
     void rotate(float angle, glm::vec3 axis);
@@ -67,8 +71,8 @@ private:
     PerspectiveProjection perspectiveProjection = {
         30.0f,
         640.0f / 480.0f,
-        1.0f,
-        10.0f
+        0.1f,
+        100.0f
     };
 
 public:
