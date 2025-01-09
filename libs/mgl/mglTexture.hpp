@@ -18,6 +18,7 @@ namespace mgl {
 
 class Texture;
 class TextureCubeMap;
+class Texture2D;
 struct TextureInfo;
 
 //////////////////////////////////////////////////////////////////////// TEXTURE
@@ -45,6 +46,15 @@ struct TextureInfo {
   TextureInfo(GLenum textureunit, GLuint index, const std::string &uniform,
               Texture *texture, Sampler *sampler);
   void updateShader(ShaderProgram *shader);
+};
+
+/////////////////////////////////////////////////////////////////////// TEXTURES
+
+class Texture2D : public Texture {
+public:
+    void bind() override;
+    void unbind() override;
+    void load(const std::string& filename);
 };
 
 //////////////////////////////////////////////////////////////////////// CUBEMAP

@@ -84,6 +84,7 @@ void SceneNode::add(SceneNode* child) {
 void SceneNode::addMesh(std::string mesh_fullname) {
 	mesh = new mgl::Mesh();
 	mesh->joinIdenticalVertices();
+	mesh->calculateTangentSpace();
 	mesh->create(mesh_fullname);
 }
 
@@ -96,8 +97,17 @@ void SceneNode::loadCubeMap(std::string prefix, std::string suffix) {
 	texture.loadCubeMap(prefix, suffix);
 }
 
+void SceneNode::loadNormalMap(std::string normalMapPath, std::string texturePath) {
+	NormalBrickTexture.load(normalMapPath);
+	BrickTexture.load(texturePath);
+}
+
 void SceneNode::toggleWater() {
 	isWater = true;
+}
+
+void SceneNode::toggleBrick() {
+	isBrick = true;
 }
 
 void SceneNode::createShaderPrograms() {
@@ -110,6 +120,10 @@ void SceneNode::createShaderPrograms() {
 		else if (isWater) {
 			Shaders->addShader(GL_VERTEX_SHADER, "water-vs.glsl");
 			Shaders->addShader(GL_FRAGMENT_SHADER, "water-fs.glsl");
+		}
+		else if (isBrick) {
+			Shaders->addShader(GL_VERTEX_SHADER, "brick-vs.glsl");
+			Shaders->addShader(GL_FRAGMENT_SHADER, "brick-fs.glsl");
 		}
 		else {
 			Shaders->addShader(GL_VERTEX_SHADER, "scene-vs.glsl");
@@ -125,9 +139,14 @@ void SceneNode::createShaderPrograms() {
 		}
 		if (mesh->hasTangentsAndBitangents()) {
 			Shaders->addAttribute(mgl::TANGENT_ATTRIBUTE, mgl::Mesh::TANGENT);
+			Shaders->addAttribute(mgl::BITANGENT_ATTRIBUTE, mgl::Mesh::BITANGENT);
 		}
 		if (isWater) {
 			Shaders->addUniform(mgl::CAMERA_POS_ATTRIBUTE);
+		}
+		if (isBrick) {
+			Shaders->addUniform("NormapMap");
+			Shaders->addUniform("Texture");
 		}
 
 		Shaders->addUniform(mgl::COLOR_ATTRIBUTE);
@@ -166,6 +185,10 @@ void SceneNode::draw(glm::vec3 cameraPos) {
 			glDisable(GL_CULL_FACE);
 			glDepthMask(GL_FALSE);
 		}
+		else if (isBrick) {
+			NormalBrickTexture.bind();
+			BrickTexture.bind();
+		}
 
 		glUniform4fv(ColorId, 1, glm::value_ptr(color));
 		glUniform3fv(LightPosId, 1, glm::value_ptr(glm::vec3(0.0, 2.0, 0.0)));
@@ -177,6 +200,10 @@ void SceneNode::draw(glm::vec3 cameraPos) {
 			texture.unbind();
 			glEnable(GL_CULL_FACE);
 			glDepthMask(GL_TRUE);
+		}
+		else if (isBrick) {
+			NormalBrickTexture.unbind();
+			BrickTexture.unbind();
 		}
 
 		Shaders->unbind();

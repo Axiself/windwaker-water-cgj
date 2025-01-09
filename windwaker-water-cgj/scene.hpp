@@ -40,13 +40,21 @@ private:
     GLint SkyboxTextureId;
     mgl::TextureCubeMap texture;
 
+	GLint NormalBrickTextureId;
+	mgl::Texture2D NormalBrickTexture;
+	GLint BrickTextureId;
+	mgl::Texture2D BrickTexture;
+
     bool isWater = false;
+	bool isBrick = false;
 
 public:
     void addMesh(std::string mesh_fullname);
     void toggleSkybox();
 	void loadCubeMap(std::string prefix, std::string suffix);
+    void loadNormalMap(std::string normalMapPath, std::string texturePath);
     void toggleWater();
+    void toggleBrick();
     void draw(glm::vec3 cameraPos);
     void add(SceneNode* child);
     void rotate(float angle, glm::vec3 axis);

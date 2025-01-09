@@ -30,6 +30,7 @@ private:
     SceneNode Ocean;
     SceneNode WaterPlane;
     SceneNode WaterFoam;
+    SceneNode Brick;
 
     double mouse_x, mouse_y;
     bool rotating = false;
@@ -52,6 +53,7 @@ private:
 void MyApp::createMeshes() {
     WaterPlane.addMesh("../assets/models/WaterPlane.obj");
 	WaterFoam.addMesh("../assets/models/Foam.obj");
+	Brick.addMesh("../assets/models/brick.obj");
 	Skybox.addMesh("../assets/models/cube-v.obj");
 }
 
@@ -62,16 +64,19 @@ void MyApp::createScene() {
     Skybox.toggleSkybox();
 	Skybox.loadCubeMap("../assets/textures/lost_at_sea", ".png");
     WaterPlane.loadCubeMap("../assets/textures/lost_at_sea", ".png");
+	Brick.loadNormalMap("../assets/textures/normal.png", "../assets/textures/diffuse.png");
 
     // set object colors
 	WaterFoam.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     WaterFoam.translate(glm::vec3(0.0f, 0.01f, 0.0f));
     WaterPlane.setColor(0.0f, 0.3f, 0.6f, 1.0f);
     WaterPlane.toggleWater();
+    Brick.toggleBrick();
 
     // add objects to the root object
 	Ocean.add(&Skybox);
 	Ocean.add(&WaterFoam);
+	Ocean.add(&Brick);
     Ocean.add(&WaterPlane);
 
     // set root
