@@ -59,11 +59,15 @@ void MyApp::createMeshes() {
 
 void MyApp::createScene() {
 	// create skybox
-	Skybox.createSkybox("../assets/textures/lost_at_sea", ".png");
+    Skybox.toggleSkybox();
+	Skybox.loadCubeMap("../assets/textures/lost_at_sea", ".png");
+    WaterPlane.loadCubeMap("../assets/textures/lost_at_sea", ".png");
 
     // set object colors
 	WaterFoam.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-    WaterPlane.setColor(0.0f, 0.3f, 0.6f, 0.5f);
+    WaterFoam.translate(glm::vec3(0.0f, 0.01f, 0.0f));
+    WaterPlane.setColor(0.0f, 0.3f, 0.6f, 1.0f);
+    WaterPlane.toggleWater();
 
     // add objects to the root object
 	Ocean.add(&Skybox);
@@ -90,7 +94,7 @@ void MyApp::createCamera() {
 /////////////////////////////////////////////////////////////////////////// DRAW
 
 void MyApp::drawScene(double elapsed) {
-    scene.draw();
+    scene.draw(scene.getCameraPos());
 }
 
 ////////////////////////////////////////////////////////////////////// CALLBACKS

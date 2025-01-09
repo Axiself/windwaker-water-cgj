@@ -32,6 +32,7 @@ private:
     GLint ModelMatrixId;
     GLint ColorId;
     GLint LightPosId;
+    GLint CameraPosId;
     mgl::ShaderProgram* Shaders = nullptr;
     glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -39,10 +40,14 @@ private:
     GLint SkyboxTextureId;
     mgl::TextureCubeMap texture;
 
+    bool isWater = false;
+
 public:
     void addMesh(std::string mesh_fullname);
-	void createSkybox(std::string prefix, std::string suffix);
-    void draw();
+    void toggleSkybox();
+	void loadCubeMap(std::string prefix, std::string suffix);
+    void toggleWater();
+    void draw(glm::vec3 cameraPos);
     void add(SceneNode* child);
     void rotate(float angle, glm::vec3 axis);
     void translate(glm::vec3 vector);
@@ -81,6 +86,7 @@ public:
     void cameraZoom(float zoom);
     void rotateCamera(float angle_x, float angle_y);
     void setRoot(SceneNode* node);
-    void draw();
+    void draw(glm::vec3 cameraPos);
     void createShaderPrograms();
+    glm::vec3 getCameraPos();
 };

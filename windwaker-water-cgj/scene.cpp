@@ -69,8 +69,12 @@ void SceneGraph::setRoot(SceneNode* root) {
 	this->root = root;
 }
 
-void SceneGraph::draw() {
-	root->draw();
+void SceneGraph::draw(glm::vec3 cameraPos) {
+	root->draw(cameraPos);
+}
+
+glm::vec3 SceneGraph::getCameraPos() {
+	return cameraStatus.eye;
 }
 
 void SceneNode::add(SceneNode* child) {
@@ -83,21 +87,33 @@ void SceneNode::addMesh(std::string mesh_fullname) {
 	mesh->create(mesh_fullname);
 }
 
-void SceneNode::createSkybox(std::string prefix, std::string suffix) {
+void SceneNode::toggleSkybox() {
 	isSkybox = true;
+	
+}
+
+void SceneNode::loadCubeMap(std::string prefix, std::string suffix) {
 	texture.loadCubeMap(prefix, suffix);
+}
+
+void SceneNode::toggleWater() {
+	isWater = true;
 }
 
 void SceneNode::createShaderPrograms() {
 	if (mesh != nullptr) {
 		Shaders = new mgl::ShaderProgram();
-		if (!isSkybox) {
-			Shaders->addShader(GL_VERTEX_SHADER, "scene-vs.glsl");
-			Shaders->addShader(GL_FRAGMENT_SHADER, "scene-fs.glsl");
-		}
-		else {
+		if (isSkybox) {
 			Shaders->addShader(GL_VERTEX_SHADER, "skybox-vs.glsl");
 			Shaders->addShader(GL_FRAGMENT_SHADER, "skybox-fs.glsl");
+		}
+		else if (isWater) {
+			Shaders->addShader(GL_VERTEX_SHADER, "water-vs.glsl");
+			Shaders->addShader(GL_FRAGMENT_SHADER, "water-fs.glsl");
+		}
+		else {
+			Shaders->addShader(GL_VERTEX_SHADER, "scene-vs.glsl");
+			Shaders->addShader(GL_FRAGMENT_SHADER, "scene-fs.glsl");
 		}
 
 		Shaders->addAttribute(mgl::POSITION_ATTRIBUTE, mgl::Mesh::POSITION);
@@ -110,6 +126,9 @@ void SceneNode::createShaderPrograms() {
 		if (mesh->hasTangentsAndBitangents()) {
 			Shaders->addAttribute(mgl::TANGENT_ATTRIBUTE, mgl::Mesh::TANGENT);
 		}
+		if (isWater) {
+			Shaders->addUniform(mgl::CAMERA_POS_ATTRIBUTE);
+		}
 
 		Shaders->addUniform(mgl::COLOR_ATTRIBUTE);
 		Shaders->addUniform(mgl::LIGHT_POS_ATTRIBUTE);
@@ -120,6 +139,7 @@ void SceneNode::createShaderPrograms() {
 		ModelMatrixId = Shaders->Uniforms[mgl::MODEL_MATRIX].index;
 		ColorId = Shaders->Uniforms[mgl::COLOR_ATTRIBUTE].index;
 		LightPosId = Shaders->Uniforms[mgl::LIGHT_POS_ATTRIBUTE].index;
+		CameraPosId = Shaders->Uniforms[mgl::CAMERA_POS_ATTRIBUTE].index;
 	}
 
 	for (auto& child : children) {
@@ -131,7 +151,7 @@ void SceneNode::setColor(float r, float g, float b, float a) {
 	color = glm::vec4(r, g, b, a);
 }
 
-void SceneNode::draw() {
+void SceneNode::draw(glm::vec3 cameraPos) {
 	if (color[3] < 1.0f) {
 		glEnable(GL_BLEND);
 	}
@@ -141,7 +161,7 @@ void SceneNode::draw() {
 	if (mesh != nullptr) {
 		Shaders->bind();
 
-		if (isSkybox) {
+		if (isSkybox || isWater) {
 			texture.bind();
 			glDisable(GL_CULL_FACE);
 			glDepthMask(GL_FALSE);
@@ -149,10 +169,11 @@ void SceneNode::draw() {
 
 		glUniform4fv(ColorId, 1, glm::value_ptr(color));
 		glUniform3fv(LightPosId, 1, glm::value_ptr(glm::vec3(0.0, 2.0, 0.0)));
+		glUniform3fv(CameraPosId, 1, glm::value_ptr(cameraPos));
 		glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 		mesh->draw();
 
-		if (isSkybox) {
+		if (isSkybox || isWater) {
 			texture.unbind();
 			glEnable(GL_CULL_FACE);
 			glDepthMask(GL_TRUE);
@@ -162,7 +183,7 @@ void SceneNode::draw() {
 	}
 
 	for (auto& child : children) {
-		child->draw();
+		child->draw(cameraPos);
 	}
 }
 
