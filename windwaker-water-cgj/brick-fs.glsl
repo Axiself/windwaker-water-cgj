@@ -21,13 +21,13 @@ vec4 diffuseColor(void) {
 }
 
 vec4 normalMapping(void) {
-    float ambient = 0.2;
+    float ambient = 0.3;
     vec3 normal = texture(NormalMap, exTexcoord).xyz;
     normal = normalize(normal * 2.0 - 1.0);
-    normal = normalize(exTBN * normal);
+    normal = -normalize(exTBN * normal);
     vec3 lightDir = normalize(exLightPos - exPosition); 
     float intensity = max(dot(normal, lightDir), ambient);
-    return texture(Texture, exTexcoord) * intensity;
+    return vec4(texture(Texture, exTexcoord).rgb * intensity, 1.0);
 }
 
 void main(void)

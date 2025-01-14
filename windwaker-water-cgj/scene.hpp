@@ -35,6 +35,7 @@ private:
     GLint CameraPosId;
     mgl::ShaderProgram* Shaders = nullptr;
     glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::vec3 lightPos = glm::vec3(0.0, 1.0, 0.0);
 
 	bool isSkybox = false;
     GLint SkyboxTextureId;
@@ -63,6 +64,7 @@ public:
     void setPosition(glm::vec3 vector);
     void createShaderPrograms();
     void setColor(float r, float g, float b, float a);
+    void translateLight(glm::vec3 lightTranslation);
     std::vector<SceneNode*> getChildren();
 
 };
@@ -70,9 +72,9 @@ public:
 class SceneGraph {
 private:
     SceneNode* root;
+    mgl::Camera* camera = nullptr;
 
     const GLuint UBO_BP = 0;
-    mgl::Camera* camera = nullptr;
 
     uint8_t currentCamera = 0;
     CameraStatus cameraStatus = {
@@ -96,5 +98,6 @@ public:
     void setRoot(SceneNode* node);
     void draw(glm::vec3 cameraPos);
     void createShaderPrograms();
+    void translateLight(glm::vec3 lightTranslation);
     glm::vec3 getCameraPos();
 };

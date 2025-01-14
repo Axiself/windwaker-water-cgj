@@ -35,9 +35,12 @@ private:
     double mouse_x, mouse_y;
     bool rotating = false;
 
-    float t = 0.0f;
+    float x = 0.0f;
+	float z = 0.0f;
     bool leftKeyPressed = false;
     bool rightKeyPressed = false;
+	bool upKeyPressed = false;
+	bool downKeyPressed = false;
 
     std::chrono::high_resolution_clock::time_point lastTime = std::chrono::high_resolution_clock::now();
 
@@ -51,10 +54,10 @@ private:
 ///////////////////////////////////////////////////////////////////////// MESHES
 
 void MyApp::createMeshes() {
-    WaterPlane.addMesh("../assets/models/WaterPlane.obj");
-	WaterFoam.addMesh("../assets/models/Foam.obj");
-	Brick.addMesh("../assets/models/brick.obj");
-	Skybox.addMesh("../assets/models/cube-v.obj");
+    WaterPlane.addMesh("./assets/models/WaterPlane.obj");
+	WaterFoam.addMesh("./assets/models/Foam.obj");
+	Brick.addMesh("./assets/models/Brick.obj");
+	Skybox.addMesh("./assets/models/cube-v.obj");
 }
 
 ///////////////////////////////////////////////////////////////////////// SCENE
@@ -62,9 +65,9 @@ void MyApp::createMeshes() {
 void MyApp::createScene() {
 	// create skybox
     Skybox.toggleSkybox();
-	Skybox.loadCubeMap("../assets/textures/lost_at_sea", ".png");
-    WaterPlane.loadCubeMap("../assets/textures/lost_at_sea", ".png");
-	Brick.loadNormalMap("../assets/textures/normal.png", "../assets/textures/diffuse.png");
+	Skybox.loadCubeMap("./assets/textures/lost_at_sea", ".png");
+    WaterPlane.loadCubeMap("./assets/textures/lost_at_sea", ".png");
+	Brick.loadNormalMap("./assets/textures/normal.png", "./assets/textures/diffuse.png");
 
     // set object colors
 	WaterFoam.setColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -99,6 +102,38 @@ void MyApp::createCamera() {
 /////////////////////////////////////////////////////////////////////////// DRAW
 
 void MyApp::drawScene(double elapsed) {
+    const float animation_speed = 2.0f;
+
+    if (leftKeyPressed) {
+        x -= animation_speed * static_cast<float>(elapsed);
+        if (x < -2.0f) {
+            x = -2.0f;
+        }
+    }
+
+    if (rightKeyPressed) {
+        x += animation_speed * static_cast<float>(elapsed);
+        if (x > 2.0f) {
+            x = 2.0f;
+        }
+    }
+
+	if (downKeyPressed) {
+		z += animation_speed * static_cast<float>(elapsed);
+		if (z > 2.0f) {
+			z = 2.0f;
+		}
+	}
+
+	if (upKeyPressed) {
+		z -= animation_speed * static_cast<float>(elapsed);
+		if (z < -2.0f) {
+			z = -2.0f;
+		}
+	}
+
+	scene.translateLight(glm::vec3(x, 0.0f, z));
+
     scene.draw(scene.getCameraPos());
 }
 
@@ -119,6 +154,39 @@ void MyApp::windowSizeCallback(GLFWwindow* win, int winx, int winy) {
 void MyApp::displayCallback(GLFWwindow* win, double elapsed) { drawScene(elapsed); }
 
 void MyApp::keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
+	glm::vec3 lightTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && !rightKeyPressed) {
+        leftKeyPressed = true;
+    }
+
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS && !leftKeyPressed) {
+        rightKeyPressed = true;
+    }
+
+    if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
+        leftKeyPressed = false;
+    }
+
+    if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
+        rightKeyPressed = false;
+    }
+
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS && !downKeyPressed) {
+        upKeyPressed = true;
+	}
+
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS && !upKeyPressed) {
+        downKeyPressed = true;
+    }
+
+	if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
+		upKeyPressed = false;
+	}
+
+    if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
+        downKeyPressed = false;
+    }
 }
 
 void MyApp::scrollCallback(GLFWwindow* win, double xoffset, double yoffset) {

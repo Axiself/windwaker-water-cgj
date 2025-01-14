@@ -9,7 +9,7 @@ in vec4 exColor;
 out vec4 FragmentColor;
 
 vec4 diffuseColor(void) {
-    float ambient = 0.2;
+    float ambient = 0.3;
     vec3 N = normalize(exNormal);          
     vec3 lightDir = normalize(exLightPos - exPosition); 
     float intensity = max(dot(N, lightDir), ambient);

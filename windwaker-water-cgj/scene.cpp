@@ -77,6 +77,10 @@ glm::vec3 SceneGraph::getCameraPos() {
 	return cameraStatus.eye;
 }
 
+void SceneGraph::translateLight(glm::vec3 lightTransation) {
+	root->translateLight(lightTransation);
+}
+
 void SceneNode::add(SceneNode* child) {
 	children.push_back(child);
 }
@@ -145,7 +149,7 @@ void SceneNode::createShaderPrograms() {
 			Shaders->addUniform(mgl::CAMERA_POS_ATTRIBUTE);
 		}
 		if (isBrick) {
-			Shaders->addUniform("NormapMap");
+			Shaders->addUniform("NormalMap");
 			Shaders->addUniform("Texture");
 		}
 
@@ -191,7 +195,7 @@ void SceneNode::draw(glm::vec3 cameraPos) {
 		}
 
 		glUniform4fv(ColorId, 1, glm::value_ptr(color));
-		glUniform3fv(LightPosId, 1, glm::value_ptr(glm::vec3(0.0, 2.0, 0.0)));
+		glUniform3fv(LightPosId, 1, glm::value_ptr(lightPos));
 		glUniform3fv(CameraPosId, 1, glm::value_ptr(cameraPos));
 		glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 		mesh->draw();
@@ -211,6 +215,13 @@ void SceneNode::draw(glm::vec3 cameraPos) {
 
 	for (auto& child : children) {
 		child->draw(cameraPos);
+	}
+}
+
+void SceneNode::translateLight(glm::vec3 lightTranslation) {
+	lightPos = glm::vec3(lightTranslation.x, lightPos.y, lightTranslation.z);
+	for (auto& child : children) {
+		child->translateLight(lightTranslation);
 	}
 }
 
